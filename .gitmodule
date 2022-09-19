@@ -1,0 +1,3 @@
+[submodule "communication-subspace"]
+	path = communication-subspace
+	url = https://github.com/joao-semedo/communication-subspace.git
