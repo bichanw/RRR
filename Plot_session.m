@@ -1,5 +1,5 @@
 % set up
-clear;clc;addpath(genpath('communication-subspace'));
+clear;clc;addpath(genpath('communication-subspace'));addpath(genpath('helpfun'));
 
 Folders = {'/jukebox/Bezos/Ryan/Bay2/ACC/CaMKIIa_tetO_7/07302021_T10',...
 		   '/jukebox/Bezos/Ryan/Bay2/ACC/CaMKIIa_tetO_7/08022021_T10',...
@@ -26,14 +26,17 @@ for folder = Folders
 	Xsup  = catcell(Epoch.Spike_Epoch_sm(Deep==0));
 
 	% --- Plotting Functions ---
-	% ops = struct('dim',0:10,'if_plot',false,'twin',[0 10]+[1:11:77]'); ops.win_name = arrayfun(@(i) num2str(i), 1:7,'UniformOutput',false);% average bin
-	% ops = struct('method','ridge','if_plot',true,'lamdba',[0:100:1000 1e4]); % ridge
+	% parameter file, change if default is not desired
+	% this is the ops used for 7 bins of 11 bin width
+		% ops = struct('dim',0:10,'if_plot',false,'twin',[0 10]+[1:11:77]'); ops.win_name = arrayfun(@(i) num2str(i), 1:7,'UniformOutput',false);% average bin
+	% ops used for ridge regression
+		% ops = struct('method','ridge','if_plot',true,'lamdba',[0:100:1000 1e4]); % ridge
 	try
 		% plt_session.choice_selectivity(Xsup,Xdeep,Epoch.left,Epoch.right);
 		% plt_session.PC_RRR(Xsup,Xdeep);
-		% [ops,cvloss(end+1,:,:,:)] = plt_session.averaged_RRR(Xsup,Xdeep);
 		% plt_session.averaged_RRR(Xdeep,Xsup);
-		theta_plane_choice(end+1,:) = plt_session.axis_angle(Epoch,Deep);
+		[ops,cvloss(end+1,:,:,:)] = plt_session.averaged_RRR(Xsup,Xdeep);
+		% theta_plane_choice(end+1,:) = plt_session.axis_angle(Epoch,Deep);
 	catch ME
 		save('error.mat','ME','folder');
 		continue;
