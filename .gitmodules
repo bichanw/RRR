@@ -1,3 +1,11 @@
 [submodule "communication-subspace"]
 	path = communication-subspace
 	url = https://github.com/joao-semedo/communication-subspace.git
+
+[submodule "helpfun/cbrewer2"]
+	path = helpfun/cbrewer2
+	url = https://github.com/scottclowe/cbrewer2.git
+
+[submodule "helpfun/export_fig"]
+	path = helpfun/export_fig
+	url = https://github.com/altmany/export_fig
