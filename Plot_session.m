@@ -22,6 +22,7 @@ for folder = Folders
 	session_name = get_ses_name(folder{1});
 
 	% concatenate activity
+	% matrix size - trials * time points * cells
 	Xdeep = catcell(Epoch.Spike_Epoch_sm(Deep==1));
 	Xsup  = catcell(Epoch.Spike_Epoch_sm(Deep==0));
 
