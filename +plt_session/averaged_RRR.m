@@ -1,4 +1,6 @@
 function [ops,cvloss] = averaged_RRR(Xsup,Xdeep,ops)
+% function that organize our own data and run RRR through the package
+
 if nargin < 3
 	ops = struct('dim',0:10,'if_plot',false);
 end
@@ -13,7 +15,7 @@ for iwin = 1:numel(ops.win_name)
 	X = squeeze(mean(Xsup(:,ops.twin(iwin,1):ops.twin(iwin,2),:),2));
 	Y = squeeze(mean(Xdeep(:,ops.twin(iwin,1):ops.twin(iwin,2),:),2));
 
-	% RRR
+	% RRR - in helpfun folder, adapted from communication-subspace package
 	[cvloss(iwin,:,:),ops] = RRR(X,Y,ops);
 
 	% % ridge for full model

@@ -26,11 +26,13 @@ for folder = Folders
 	Xsup  = catcell(Epoch.Spike_Epoch_sm(Deep==0));
 
 	% --- Plotting Functions ---
-	% parameter file, change if default is not desired
+	% parameter variable, change if default is not desired
 	% this is the ops used for 7 bins of 11 bin width
 		% ops = struct('dim',0:10,'if_plot',false,'twin',[0 10]+[1:11:77]'); ops.win_name = arrayfun(@(i) num2str(i), 1:7,'UniformOutput',false);% average bin
 	% ops used for ridge regression
 		% ops = struct('method','ridge','if_plot',true,'lamdba',[0:100:1000 1e4]); % ridge
+	
+	% contains analysis you do session-by-session
 	try
 		% plt_session.choice_selectivity(Xsup,Xdeep,Epoch.left,Epoch.right);
 		% plt_session.PC_RRR(Xsup,Xdeep);
