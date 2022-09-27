@@ -1,15 +1,17 @@
-function choice_selectivity(Xsup,Xdeep,ind_left,ind_right)
+function [B_, choice, dp] = choice_selectivity(Xsup,Xdeep,ind_left,ind_right)
 
 ops = struct;
 ops.twin = getOr(ops,'twin',[6 25;26 40]);
 ops.win_name = getOr(ops,'win_name',{'cue','delay'});
 
 nwins = numel(ops.win_name);
-ax = np(2,2); 
+ax = np(2,2);  % distribution
 for iwin = 1:nwins
 	X = squeeze(mean(Xsup(:,ops.twin(iwin,1):ops.twin(iwin,2),:),2));
 	Y = squeeze(mean(Xdeep(:,ops.twin(iwin,1):ops.twin(iwin,2),:),2));
 
+	% calculate B
+	[B_{iwin},coeff] = my_RRR(X,Y,2);
 
 	sig = {X,Y};
 	for isig = 1:numel(sig)
@@ -17,18 +19,28 @@ for iwin = 1:nwins
 		L = mean(sig{isig}(ind_left,:),1);
 		R = mean(sig{isig}(ind_right,:),1);
 
-		choice = (L-R) ./ (L+R);
-		dp = my_dp(sig{isig}(ind_left,:),sig{isig}(ind_right,:)); 
+		choice{iwin,isig} = (L-R) ./ (L+R);
+		dp{iwin,isig} = my_dp(sig{isig}(ind_left,:),sig{isig}(ind_right,:)); 
 
-		histogram(ax(sub2ind([2 2],iwin,isig)),choice);
-		histogram(ax(sub2ind([2 2],iwin,isig)),dp);
+		% plot choice selectivity against sum of B
+		scatter(ax(sub2ind([2 2],iwin,isig)),abs(choice{iwin,isig}),sum(abs(B_{iwin}),3-isig));
+		
+		% old code - plot histogram of choice / dp
+		% histogram(ax(sub2ind([2 2],iwin,isig)),choice{iwin,isig});
+		% histogram(ax(sub2ind([2 2],iwin,isig)),dp{iwin,isig});
 	end
+
 end
 
-% figure setting
-title(ax(1),'choice selectivity'); title(ax(2),"d'");
-ylabel(ax(1),'X'); ylabel(ax(3),'Y');
-legend(ax(end),ops.win_name);
+% figure setting - scatter
+	title(ax(1),'cue'); title(ax(2),'delay');
+	ylabel(ax(1),{'superficial','comm strength'}); ylabel(ax(3),{'deep','comm strength'});
+	xlabel(ax(3),'choice selectivity');xlabel(ax(4),'choice selectivity');
+
+% figure setting - histogram
+	% title(ax(1),'choice selectivity'); title(ax(2),"d'");
+	% ylabel(ax(1),'X'); ylabel(ax(3),'Y');
+	% legend(ax(end),ops.win_name);
 
 % plots to examine value
 	% % examine scatter plots
