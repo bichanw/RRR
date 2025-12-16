@@ -37,7 +37,7 @@ def alignment_output(X, Y, W):
     # Compute alignment index
     muscom = np.mean(scomcum_nrm)
     muspop = np.mean(spopcum_nrm)
-    alignment_raw = muscom - muspop
+    alignment_raw = np.dot(scomvec, spopvec) # dot product of scomvec and spopvec
 
     # Compute communication fraction
     commfrac = np.sum(scomvec) / np.sum(spopvec)
@@ -51,7 +51,7 @@ def alignment_output(X, Y, W):
     scommax[ii:] = 0
     scommax[ii] = totcom - np.sum(scommax[:ii])
     scommax_cum = np.cumsum(scommax) / np.sum(scommax)
-    a_max = np.mean(scommax_cum) - muspop
+    a_max = np.dot(scommax, spopvec)
 
     # Min possible alignment (flip order of eigenvalues)
     spopvec_rev = np.flipud(spopvec)
@@ -62,13 +62,10 @@ def alignment_output(X, Y, W):
     scommin[ii] = totcom - np.sum(scommin[:ii])
     scommin = np.flipud(scommin)  # flip back
     scommin_cum = np.cumsum(scommin) / np.sum(scommin)
-    a_min = np.mean(scommin_cum) - muspop
+    a_min = np.dot(scommin, spopvec)
 
     # Rescale alignment
-    if alignment_raw > 0:
-        outputalignmentidx = alignment_raw / a_max
-    else:
-        outputalignmentidx = alignment_raw / abs(a_min)
+    outputalignmentidx = (alignment_raw - a_min) / (a_max - a_min)
 
     return outputalignmentidx, commfrac
 

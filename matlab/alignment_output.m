@@ -28,11 +28,8 @@ scomvec = diag(upop'*cov_predicted*upop);
 % scomvec_nrm = scomvec./sum(scomvec);
 scomcum_nrm = cumsum(scomvec)/sum(scomvec);
 
-% compute alignment index
-muscom = mean(scomcum_nrm);
-muspop = mean(spopcum_nrm);
 
-alignment_raw = muscom-muspop;
+a_raw = spopvec' * scomvec;
 
 % compute communication fraction
 commfrac = sum(scomvec)/sum(spopvec);
@@ -45,8 +42,7 @@ ii = find(spopcum>totcom+1e-10,1);  % find how many dimensions we'd need for max
 scommax = spopvec;
 scommax(ii:end) = 0;
 scommax(ii) = totcom-sum(scommax); % fix up final bin
-scommax_cum = cumsum(scommax)/sum(scommax); % compute cumulative
-a_max = mean(scommax_cum)-muspop; % max possible alignment score
+a_max = spopvec' * scommax; % max possible alignment score
 
 % compute min possible alignment (by flipping order of pop eigenvalues)
 spopvec_rev = flipud(spopvec);
@@ -56,55 +52,9 @@ scommin = spopvec_rev;
 scommin(ii:end) = 0;
 scommin(ii) = totcom-sum(scommin); % fix up final bin
 scommin = flipud(scommin); % flip back to normal ordering
-scommin_cum = cumsum(scommin)/sum(scommin); % compute cumulative
-a_min = mean(scommin_cum)-muspop; % min possible alignment score
+a_min = spopvec' * scommin; % min possible alignment score
 
 % rescale alignment scores above and below zero
-if alignment_raw>0
-    outputalignmentidx = alignment_raw/a_max;
-else
-    outputalignmentidx = alignment_raw/abs(a_min);
-end
-% fprintf('alignment index=%.2f\n',outputalignmentidx);
+outputalignmentidx = (a_raw - a_min) / (a_max - a_min);
 
-
-if if_plot
-% ====================================
-% make plots
-close all;
-clrs = get(gca,'colororder');
-nd = size(upop,1);  % number of output neurons
-
-subplot(221);
-plot(1:nd,spopvec_nrm,'o-',1:nd,scomvec/sum(spopvec),'*-');
-ylabel('normalized variance'); box off;
-set(gca,'ylim',[0 spopvec_nrm(1)*1.1]);
-xlabel('PC dimension');
-title('fraction of variance in PC dimensions');
-legend('PC','communication','location', 'north');
-
-subplot(223);
-plot(1:nd,spopcum_nrm,'-o',1:nd,scomcum_nrm,'-*'); box off;
-xlabel('PC dimension');
-ylabel('normalized cumulative variance');
-title('fraction of variance');
-hold on;
-plot([1 nd],muspop*[1 1], '--','color',clrs(1,:));
-plot([1 nd], muscom*[1 1],'--','color',clrs(2,:));
-hold off;
-set(gca,'ylim',[0 1]);
-legend('PCs', 'communiction', 'mean(PCs)', 'mean(communication)',...
-    'location','south');
-
-subplot(222);
-plot(commfrac,outputalignmentidx,'k*'); 
-hold on; 
-plot([0 1],[0 0],'k--', [0.5 0.5], [-1 1], 'k--','linewidth',1); hold off;
-%plot(outputalignment*[1 1],[0 1],'k', outputalignment,1,'k*');
-set(gca,'ylim',[-1.0 1.01], 'xtick',-1:.5:1,'xlim',[0 1]);
-axis square;
-ylabel('output alignment index');
-xlabel('communication fraction');
-box off;
-exportgraphics(gcf,'output_alignment.pdf','ContentType','vector');
 end
